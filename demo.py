@@ -8,6 +8,7 @@ import os
 import time
 import cv2
 import tqdm
+import numpy as np
 
 from detectron2.config import get_cfg
 
@@ -84,10 +85,8 @@ if __name__ == "__main__":
             assert args.input, "The input path(s) was not found"
         for path in tqdm.tqdm(args.input, disable=not args.output):
             # use PIL, to be consistent with evaluation
-            img = read_image(path, format="BGR")
             start_time = time.time()
-            # predictions, visualized_output = demo.run_on_image(img, class_names)
-            predictions, visualized_output = demo.run_on_image_sam(img, class_names, path)
+            predictions, visualized_output_rgb, visualized_output_depth, visualized_output_rgb_sam, visualized_output_depth_sam = demo.run_on_image_sam(path, class_names)
             logger.info(
                 "{}: {} in {:.2f}s".format(
                     path,
@@ -105,10 +104,18 @@ if __name__ == "__main__":
                 else:
                     assert len(args.input) == 1, "Please specify a directory with args.output"
                     out_filename = args.output
-                visualized_output.save(out_filename)
+                visualized_output_rgb.save('RGB_Semantic_SAM.png')
+                visualized_output_depth.save('Depth_Semantic_SAM.png')
+                visualized_output_rgb_sam.save('RGB_Semantic_SAM_Mask.png')
+                visualized_output_depth_sam.save('Depth_Semantic_SAM_Mask.png')
+                rgb_3d_sam = demo.get_xyzrgb('RGB_Semantic_SAM.png', path)
+                depth_3d_sam = demo.get_xyzrgb('Depth_Semantic_SAM.png', path)
+                rgb_3d_sam_mask = demo.get_xyzrgb('RGB_Semantic_SAM_Mask.png', path)
+                depth_3d_sam_mask = demo.get_xyzrgb('Depth_Semantic_SAM_Mask.png', path)
+                np.savez('xyzrgb.npz', rgb_3d_sam = rgb_3d_sam, depth_3d_sam = depth_3d_sam, rgb_3d_sam_mask = rgb_3d_sam_mask, depth_3d_sam_mask = depth_3d_sam_mask)
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-                cv2.imshow(WINDOW_NAME, visualized_output.get_image()[:, :, ::-1])
+                cv2.imshow(WINDOW_NAME, visualized_output_rgb.get_image()[:, :, ::-1])
                 if cv2.waitKey(0) == 27:
                     break  # esc to quit
     else:

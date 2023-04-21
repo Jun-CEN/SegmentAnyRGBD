@@ -7,7 +7,10 @@ import torch
 from detectron2.data import MetadataCatalog
 from detectron2.engine.defaults import DefaultPredictor
 from detectron2.utils.visualizer import ColorMode, Visualizer
+from detectron2.data.detection_utils import read_image
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 class OVSegPredictor(DefaultPredictor):
@@ -81,6 +84,39 @@ class OVSegVisualizer(Visualizer):
             )
         return self.output
 
+    def draw_sam_seg(self, masks, area_threshold=None, alpha=0.8):
+        """
+        Draw semantic segmentation predictions/labels.
+
+        Args:
+            sem_seg (Tensor or ndarray): the segmentation of shape (H, W).
+                Each value is the integer label of the pixel.
+            area_threshold (int): segments with less than `area_threshold` are not drawn.
+            alpha (float): the larger it is, the more opaque the segmentations are.
+
+        Returns:
+            output (VisImage): image object with visualizations.
+        """
+        plt.figure()
+        if len(masks) == 0:
+            return
+        sorted_anns = sorted(masks, key=(lambda x: x['area']), reverse=True)
+        img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 3))
+        class_names = self.class_names if self.class_names is not None else self.metadata.stuff_classes
+        for ann in sorted_anns:
+            m = ann['segmentation']
+            mask_color = np.random.random((1, 3)).tolist()[0]
+        
+            self.draw_binary_mask(
+                m,
+                color=mask_color,
+                edge_color=(1.0, 1.0, 240.0 / 255),
+                text=class_names[ann['class']],
+                alpha=alpha,
+                area_threshold=area_threshold,
+            )
+        return self.output
+
 
 
 class VisualizationDemo(object):
@@ -144,19 +180,22 @@ class VisualizationDemo(object):
         
         return predictions, vis_output
     
-    def run_on_image_sam(self, image, class_names, path):
+    def run_on_image_sam(self, path, class_names):
         """
         Args:
-            image (np.ndarray): an image of shape (H, W, C) (in BGR order).
-                This is the format used by OpenCV.
+            path (str): the path of the image
         Returns:
             predictions (dict): the output of the model.
             vis_output (VisImage): the visualized image output.
         """
+        image = read_image(path, format="BGR")
         predictions = self.predictor(image, class_names)
         # Convert image from OpenCV BGR format to Matplotlib RGB format.
         image = image[:, :, ::-1]
-        visualizer = OVSegVisualizer(image, self.metadata, instance_mode=self.instance_mode, class_names=class_names)
+        visualizer_rgb = OVSegVisualizer(image, self.metadata, instance_mode=self.instance_mode, class_names=class_names)
+        visualizer_depth = OVSegVisualizer(image, self.metadata, instance_mode=self.instance_mode, class_names=class_names)
+        visualizer_rgb_sam = OVSegVisualizer(image, self.metadata, instance_mode=self.instance_mode, class_names=class_names)
+        visualizer_depth_sam = OVSegVisualizer(image, self.metadata, instance_mode=self.instance_mode, class_names=class_names)
         
         sam_checkpoint = "sam_vit_h_4b8939.pth"
         model_type = "vit_h"
@@ -173,23 +212,154 @@ class VisualizationDemo(object):
             crop_n_points_downscale_factor=0,
             min_mask_region_area=100,  # Requires open-cv to run post-processing
         )
-        masks = mask_generator_2.generate(image)
-        # masks = sorted(masks, key=(lambda x: x['area']), reverse=True)
+        print('Using SAM to generate segments for the RGB image')
+        masks_rgb = mask_generator_2.generate(image)
+
+        print('Using SAM to generate segments for the Depth map')
+        d, world_coord = self.project_2d_to_3d(path)
+        d = (d - np.min(d)) / (np.max(d) - np.min(d))
+        image_depth = mpl.colormaps['viridis'](d)*255
+        plt.figure()
+        plt.imshow(image_depth.astype(np.uint8))
+        plt.axis('off')
+        plt.savefig('Depth_rendered.png')
+        masks_depth = mask_generator_2.generate(image_depth.astype(np.uint8)[:,:,:-1])
 
         if "sem_seg" in predictions:
             r = predictions["sem_seg"]
             pred_mask = r.argmax(dim=0).to('cpu')
             pred_mask = np.array(pred_mask, dtype=np.int)
             
-            pred_mask_sam = pred_mask.copy()
-            for mask in masks:
-                cls_tmp, cls_num = np.unique(pred_mask_sam[mask['segmentation']], return_counts=True)
-                pred_mask_sam[mask['segmentation']] = cls_tmp[np.argmax(cls_num)]
+            pred_mask_sam_rgb = pred_mask.copy()
+            for mask in masks_rgb:
+                cls_tmp, cls_num = np.unique(pred_mask_sam_rgb[mask['segmentation']], return_counts=True)
+                pred_mask_sam_rgb[mask['segmentation']] = cls_tmp[np.argmax(cls_num)]
+                mask['class'] = cls_tmp[np.argmax(cls_num)]
 
-            vis_output = visualizer.draw_sem_seg(
-                pred_mask_sam
+            vis_output_rgb = visualizer_rgb.draw_sem_seg(
+                pred_mask_sam_rgb
             )
+
+            pred_mask_sam_depth = pred_mask.copy()
+            for mask in masks_depth:
+                cls_tmp, cls_num = np.unique(pred_mask_sam_depth[mask['segmentation']], return_counts=True)
+                pred_mask_sam_depth[mask['segmentation']] = cls_tmp[np.argmax(cls_num)]
+                mask['class'] = cls_tmp[np.argmax(cls_num)]
+
+            vis_output_depth = visualizer_depth.draw_sem_seg(
+                pred_mask_sam_depth
+            )
+
+            vis_output_rgb_sam = visualizer_rgb_sam.draw_sam_seg(masks_rgb)
+            vis_output_depth_sam = visualizer_depth_sam.draw_sam_seg(masks_depth)
+
         else:
             raise NotImplementedError
         
-        return predictions, vis_output
+        return predictions, vis_output_rgb, vis_output_depth, vis_output_rgb_sam, vis_output_depth_sam
+    
+    def project_2d_to_3d(self, image_path):
+
+        H = 800
+        W = 1280
+        IMAGE_SIZE = (H, W)
+
+        def pixels_to_ndcs(xx, yy, size=IMAGE_SIZE):
+            s_y, s_x = size
+            s_x -= 1  # so 1 is being mapped into (n-1)th pixel
+            s_y -= 1  # so 1 is being mapped into (n-1)th pixel
+            x = (2 / s_x) * xx - 1
+            y = (-2 / s_y) * yy + 1
+            return x, y
+        dataset_root = image_path[:-18]
+        frameId = image_path[-10:-4]
+        rage_matrices = np.load(dataset_root+'/rage_matrices/{}.npz'.format(frameId))
+
+
+        # get the (ViewProj) matrix that transform points from the world coordinate to NDC
+        # (points in world coordinate) @ VP = (points in NDC) 
+        VP = rage_matrices['VP']
+        VP_inverse = rage_matrices['VP_inv'] # NDC to world coordinate
+
+        # get the (Proj) matrix that transform points from the camera coordinate to NDC
+        # (points in camera coordinate) @ P = (points in NDC) 
+        P = rage_matrices['P']
+        P_inverse = rage_matrices['P_inv'] # NDC to camera coordinate
+        # print(VP, VP_inverse, P, P_inverse)
+
+        d = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
+        d = d/6.0 - 4e-5 # convert to NDC coordinate
+
+        px = np.arange(0, W)
+        py = np.arange(0, H)
+        px, py = np.meshgrid(px, py, sparse=False)
+        px = px.reshape(-1)
+        py = py.reshape(-1)
+
+        ndcz = d[py, px] # get the depth in NDC
+        ndcx, ndcy = pixels_to_ndcs(px, py)
+        ndc_coord = np.stack([ndcx, ndcy, ndcz, np.ones_like(ndcz)], axis=1)
+
+        camera_coord = ndc_coord @ P_inverse
+        camera_coord = camera_coord/camera_coord[:,-1:]
+
+        world_coord = ndc_coord @ VP_inverse
+        world_coord = world_coord/world_coord[:,-1:]
+
+        return d, world_coord
+
+    def get_xyzrgb(self, rgb_path, image_path):
+
+        H = 800
+        W = 1280
+        IMAGE_SIZE = (H, W)
+
+        def pixels_to_ndcs(xx, yy, size=IMAGE_SIZE):
+            s_y, s_x = size
+            s_x -= 1  # so 1 is being mapped into (n-1)th pixel
+            s_y -= 1  # so 1 is being mapped into (n-1)th pixel
+            x = (2 / s_x) * xx - 1
+            y = (-2 / s_y) * yy + 1
+            return x, y
+        dataset_root = image_path[:-18]
+        frameId = image_path[-10:-4]
+        rage_matrices = np.load(dataset_root+'/rage_matrices/{}.npz'.format(frameId))
+
+
+        # get the (ViewProj) matrix that transform points from the world coordinate to NDC
+        # (points in world coordinate) @ VP = (points in NDC) 
+        VP = rage_matrices['VP']
+        VP_inverse = rage_matrices['VP_inv'] # NDC to world coordinate
+
+        # get the (Proj) matrix that transform points from the camera coordinate to NDC
+        # (points in camera coordinate) @ P = (points in NDC) 
+        P = rage_matrices['P']
+        P_inverse = rage_matrices['P_inv'] # NDC to camera coordinate
+        # print(VP, VP_inverse, P, P_inverse)
+
+        d = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
+        d = d/6.0 - 4e-5 # convert to NDC coordinate
+
+        px = np.arange(0, W)
+        py = np.arange(0, H)
+        px, py = np.meshgrid(px, py, sparse=False)
+        px = px.reshape(-1)
+        py = py.reshape(-1)
+
+        ndcz = d[py, px] # get the depth in NDC
+        ndcx, ndcy = pixels_to_ndcs(px, py)
+        ndc_coord = np.stack([ndcx, ndcy, ndcz, np.ones_like(ndcz)], axis=1)
+
+        camera_coord = ndc_coord @ P_inverse
+        camera_coord = camera_coord/camera_coord[:,-1:]
+
+        world_coord = ndc_coord @ VP_inverse
+        world_coord = world_coord/world_coord[:,-1:]
+
+        rgb = read_image(rgb_path, format="BGR")
+        rgb = rgb[:, :, ::-1]
+        rgb = rgb[py, px, :]
+
+        xyzrgb = np.concatenate((world_coord[:,:-1], rgb), axis=1)
+
+        return xyzrgb

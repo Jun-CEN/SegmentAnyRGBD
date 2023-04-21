@@ -395,7 +395,6 @@ class OVSegDEMO(MaskFormer):
         )
         mask_cls_results = outputs["pred_logits"]
         mask_pred_results = outputs["pred_masks"]
-        print('1: ', mask_cls_results.shape, mask_pred_results.shape)
         # upsample masks
         mask_pred_results = F.interpolate(
             mask_pred_results,
@@ -403,7 +402,6 @@ class OVSegDEMO(MaskFormer):
             mode="bilinear",
             align_corners=False,
         )
-        print('2: ', mask_cls_results.shape, mask_pred_results.shape)
 
         processed_results = []
         for mask_cls_result, mask_pred_result, input_per_image, image_size in zip(
@@ -422,7 +420,6 @@ class OVSegDEMO(MaskFormer):
             width = input_per_image.get("width", image_size[1])
             r = sem_seg_postprocess(r, image_size, height, width)
             processed_results.append({"sem_seg": r})
-        print(processed_results[0]["sem_seg"].shape)
 
         return processed_results
 
