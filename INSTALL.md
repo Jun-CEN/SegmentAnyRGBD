@@ -1,11 +1,12 @@
 ## Installation
 
 ### Requirements
-- Linux with Python ≥ 3.6
+- Linux with Python ≥ 3.8
 - PyTorch ≥ 1.8 and [torchvision](https://github.com/pytorch/vision/) that matches the PyTorch installation.
   Install them together at [pytorch.org](https://pytorch.org) to make sure of this. Note, please check
   PyTorch version matches that is required by Detectron2.
 - Detectron2: follow [Detectron2 installation instructions](https://detectron2.readthedocs.io/tutorials/install.html).
+- Segment Anything Model: follow [SAM](https://github.com/facebookresearch/segment-anything).
 
 ### Usage
 
@@ -24,6 +25,19 @@ You need to download `detectron2==0.6` following [instructions](https://detectro
 python -m pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu113/torch1.10/index.html
 ```
 
+If you cannot succefully install `pycocotools`, try this from [here](https://github.com/cocodataset/cocoapi/issues/351):
+```bash
+conda install -c conda-forge pycocotools
+```
+
+Install the SAM with:
+```bash
+pip install git+https://github.com/facebookresearch/segment-anything.git
+```
+To fully support the SAM, install these packages:
+```bash
+pip install opencv-python pycocotools matplotlib onnxruntime onnx
+```
 
 FurtherMore, install the modified clip package.
 

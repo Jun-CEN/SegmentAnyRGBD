@@ -367,5 +367,5 @@ class VisualizationDemo(object):
 
         return xyzrgb
     
-    def render_3d_video(self, xyzrgb_path, depth_path):
+    # def render_3d_video(self, xyzrgb_path, depth_path):
         

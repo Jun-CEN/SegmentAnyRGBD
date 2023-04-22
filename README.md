@@ -1,21 +1,26 @@
-# [OVSeg] Open-Vocabulary Semantic Segmentation with Mask-adapted CLIP
+<p align="center">
+<img src="resources/title.png" width="80%">
+</p>  
 
-<img src="resources/pytorch-logo-dark.png" width="10%">
+- Authors: [Jun Cen](www.cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/)
+- Institutes: The Hong Kong University of Science and Technology, Huazhong University of Science and Technology, Nanyang Technological University  
 
-This is the official PyTorch implementation of our paper: <br>
-**Open-Vocabulary Semantic Segmentation with Mask-adapted CLIP**<br>
-[Feng Liang](https://jeff-liangf.github.io/), [Bichen Wu](https://www.linkedin.com/in/bichenwu), [Xiaoliang Dai](https://sites.google.com/view/xiaoliangdai/), [Kunpeng Li](https://kunpengli1994.github.io/), [Yinan Zhao](https://yinan-zhao.github.io/), [Hang Zhang](https://hangzhang.org/), [Peizhao Zhang](https://www.linkedin.com/in/peizhao-zhang-14846042/), [Peter Vajda](https://sites.google.com/site/vajdap), [Diana Marculescu](https://www.ece.utexas.edu/people/faculty/diana-marculescu)
+***
+[SAM](https://github.com/facebookresearch/segment-anything) is a very powerful segmentation model. [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything) extends the SAM with the semantic segmentation ability. [Anything-3D](https://github.com/Anything-of-anything/Anything-3D) uses SAM to obtain the object mask for object-level 3D generation, and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D) segments multiple 2D frames for 3D scene segmentation.  The input images to SAM are all **RGB** images in [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything), [Anything-3D](https://github.com/Anything-of-anything/Anything-3D), and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D). We find that humans can naturally identify objects from the visulization of the depth map, so we first map the depth map ([H, W]) to the RGB space ([H, W, 3]) by a [colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html#lightness-of-matplotlib-colormaps) function, and then feed the **rendered depth image** into SAM. Compared to the RGB image, the rendered depth image ignores the texture information and focuses on the **geometry** information. The following figures show that the SAM segments the table into 4 parts based on the RGB image, but segments the table as a whole object when inputs are rendered depth images.
+<p align="center">
+<img src="resources/examples.png" width="100%">
+</p>
 
-[[arXiv](https://arxiv.org/abs/2210.04150)] [[Project](https://jeff-liangf.github.io/projects/ovseg/)]
+In this repo, we provide two alternatives for the users, including feeding the RGB images or rendered depth images to the SAM. In each mode, the user could obtain the semantic masks (one color refers to one class) and the SAM masks with the class. The overall structure is shown in the following figure.
 
 <p align="center">
-<img src="resources/ovseg.gif" width="100%">
+<img src="resources/flowchart.png" width="100%">
 </p>
 
 
 ## Installation    
 
-Please see [installation guide](./INSTALL.md).111
+Please see [installation guide](./INSTALL.md).
 
 ## Data Preparation
 
