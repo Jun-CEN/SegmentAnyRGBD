@@ -1,5 +1,5 @@
 <p align="center">
-<img src="resources/title.png" width="80%">
+<img src="resources/title_2.png" width="100%">
 </p>  
 
 - Authors: [Jun Cen](www.cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/)
@@ -8,7 +8,7 @@
 ***
 [SAM](https://github.com/facebookresearch/segment-anything) is a very powerful segmentation model. [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything) extends the SAM with the semantic segmentation ability. [Anything-3D](https://github.com/Anything-of-anything/Anything-3D) uses SAM to obtain the object mask for object-level 3D generation, and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D) segments multiple 2D frames for 3D scene segmentation.  The input images to SAM are all **RGB** images in [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything), [Anything-3D](https://github.com/Anything-of-anything/Anything-3D), and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D). We find that humans can naturally identify objects from the visulization of the depth map, so we first map the depth map ([H, W]) to the RGB space ([H, W, 3]) by a [colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html#lightness-of-matplotlib-colormaps) function, and then feed the **rendered depth image** into SAM. Compared to the RGB image, the rendered depth image ignores the texture information and focuses on the **geometry** information. The following figures show that the SAM segments the table into 4 parts based on the RGB image, but segments the table as a whole object when inputs are rendered depth images.
 <p align="center">
-<img src="resources/examples.png" width="100%">
+<img src="resources/examples_2.png" width="100%">
 </p>
 
 In this repo, we provide two alternatives for the users, including feeding the RGB images or rendered depth images to the SAM. In each mode, the user could obtain the semantic masks (one color refers to one class) and the SAM masks with the class. The overall structure is shown in the following figure.
@@ -19,7 +19,7 @@ In this repo, we provide two alternatives for the users, including feeding the R
 
 ## Demos
 ### Sailvos3D Dataset
-| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visulization |
+| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visualization |
 | :---: | :---:| :---:|
 | <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_rgb_3d_sam_mask.gif" width="100%">|
 | <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_depth_3d_sam_mask.gif" width="100%">|
