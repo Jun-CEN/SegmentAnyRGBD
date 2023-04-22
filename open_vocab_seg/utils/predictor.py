@@ -398,7 +398,7 @@ class VisualizationDemo(object):
         pts[:, 1] = ((pts[:, 1] - pts[:, 1].min()) / (pts[:, 1].max() - pts[:, 1].min()) - 0.7) * 2
         pts[:, 2] = ((pts[:, 2] - pts[:, 2].min()) / (pts[:, 2].max() - pts[:, 2].min()) - 0.5) * 2
         
-        num_frames = 90
+        num_frames = 45
         degrees = np.linspace(120, 220, num_frames)
         
         total = ['rgb_3d_sam', 'depth_3d_sam', 'rgb_3d_sam_mask', 'depth_3d_sam_mask']

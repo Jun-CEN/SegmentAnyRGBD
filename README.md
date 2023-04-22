@@ -14,15 +14,17 @@
 In this repo, we provide two alternatives for the users, including feeding the RGB images or rendered depth images to the SAM. In each mode, the user could obtain the semantic masks (one color refers to one class) and the SAM masks with the class. The overall structure is shown in the following figure.
 
 <p align="center">
-<img src="resources/flowchart.png" width="100%">
+<img src="resources/flowchart_2.png" width="100%">
 </p>
 
 ## Demos
 ### Sailvos3D Dataset
 | Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visualization |
 | :---: | :---:| :---:|
-| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_rgb_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_depth_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/rgb_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/depth_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_2/000540.bmp" width="100%"> | <img src="resources/demos/sailvos_2/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/rgb_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/sailvos_2/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/depth_3d_sam_mask.gif" width="100%">|
 ## Installation    
 
 Please see [installation guide](./INSTALL.md).
