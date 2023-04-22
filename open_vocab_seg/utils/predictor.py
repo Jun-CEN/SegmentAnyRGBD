@@ -84,7 +84,7 @@ class OVSegVisualizer(Visualizer):
             )
         return self.output
 
-    def draw_sam_seg(self, masks, area_threshold=None, alpha=0.8):
+    def draw_sam_seg(self, masks, area_threshold=None, alpha=0.5):
         """
         Draw semantic segmentation predictions/labels.
 
@@ -218,7 +218,7 @@ class VisualizationDemo(object):
         print('Using SAM to generate segments for the Depth map')
         d, world_coord = self.project_2d_to_3d(path)
         d = (d - np.min(d)) / (np.max(d) - np.min(d))
-        image_depth = mpl.colormaps['viridis'](d)*255
+        image_depth = mpl.colormaps['plasma'](d)*255
         plt.figure()
         plt.imshow(image_depth.astype(np.uint8))
         plt.axis('off')
@@ -239,6 +239,9 @@ class VisualizationDemo(object):
             vis_output_rgb = visualizer_rgb.draw_sem_seg(
                 pred_mask_sam_rgb
             )
+            # vis_output_rgb = visualizer_rgb.draw_sem_seg(
+            #     pred_mask, alpha=1
+            # )
 
             pred_mask_sam_depth = pred_mask.copy()
             for mask in masks_depth:
@@ -363,3 +366,6 @@ class VisualizationDemo(object):
         xyzrgb = np.concatenate((world_coord[:,:-1], rgb), axis=1)
 
         return xyzrgb
+    
+    def render_3d_video(self, xyzrgb_path, depth_path):
+        
