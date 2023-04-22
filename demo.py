@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 rgb_3d_sam_mask = demo.get_xyzrgb('RGB_Semantic_SAM_Mask.png', path)
                 depth_3d_sam_mask = demo.get_xyzrgb('Depth_Semantic_SAM_Mask.png', path)
                 np.savez('xyzrgb.npz', rgb_3d_sam = rgb_3d_sam, depth_3d_sam = depth_3d_sam, rgb_3d_sam_mask = rgb_3d_sam_mask, depth_3d_sam_mask = depth_3d_sam_mask)
-                demo.render_3d_video('xyzrgb.npz', '000160.npy')
+                demo.render_3d_video('xyzrgb.npz', path)
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                 cv2.imshow(WINDOW_NAME, visualized_output_rgb.get_image()[:, :, ::-1])

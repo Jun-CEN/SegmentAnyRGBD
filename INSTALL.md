@@ -5,6 +5,7 @@
 - PyTorch ≥ 1.8 and [torchvision](https://github.com/pytorch/vision/) that matches the PyTorch installation.
   Install them together at [pytorch.org](https://pytorch.org) to make sure of this. Note, please check
   PyTorch version matches that is required by Detectron2.
+- PyTorch3d: follow [Pytorch3d installation instructions](https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md).
 - Detectron2: follow [Detectron2 installation instructions](https://detectron2.readthedocs.io/tutorials/install.html).
 - Segment Anything Model: follow [SAM](https://github.com/facebookresearch/segment-anything).
 
@@ -16,6 +17,8 @@ Install required packages.
 conda create --name ovseg python=3.8
 conda activate ovseg
 conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge
+conda install -c fvcore -c iopath -c conda-forge fvcore iopath
+conda install pytorch3d -c pytorch3d
 pip install -r requirements.txt
 ```
 

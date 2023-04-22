@@ -17,7 +17,7 @@ from detectron2.data.detection_utils import read_image
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from pcd_rendering import unproject_pts_pt, get_coord_grids_pt, create_pcd_renderer
+from .pcd_rendering import unproject_pts_pt, get_coord_grids_pt, create_pcd_renderer
 
 
 class OVSegPredictor(DefaultPredictor):
@@ -374,11 +374,13 @@ class VisualizationDemo(object):
 
         return xyzrgb
     
-    def render_3d_video(self, xyzrgb_path, depth_path):
+    def render_3d_video(self, xyzrgb_path, image_path):
+        dataset_root = image_path[:-18]
+        frameId = image_path[-10:-4]
         device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
         
         xyzrgb = np.load(xyzrgb_path)
-        depth = np.load(depth_path)
+        depth = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
         depth = torch.tensor(depth).to(device)
         depth = 1 / depth
         
@@ -390,7 +392,7 @@ class VisualizationDemo(object):
                               [0, 0, 1]])
 
         intrinsic = torch.from_numpy(intrinsic).float()[None].to(device)
-        coord = get_coord_grids_pt(h, w, device=device).float()[None]
+        coord = get_coord_grids_pt(H, W, device=device).float()[None]
         pts = unproject_pts_pt(intrinsic, coord.reshape(-1, 2), depth)
         pts[:, 0] = ((pts[:, 0] - pts[:, 0].min()) / (pts[:, 0].max() - pts[:, 0].min()) - 0.5) * 2
         pts[:, 1] = ((pts[:, 1] - pts[:, 1].min()) / (pts[:, 1].max() - pts[:, 1].min()) - 0.7) * 2
@@ -405,9 +407,9 @@ class VisualizationDemo(object):
             img = torch.from_numpy(xyzrgb[name][:, 3:] / 255.).to(device).float()
             pcd = Pointclouds(points=[pts], features=[img.squeeze().reshape(-1, 3)])
             frames = []
-            for i in tqdm(np.range(num_frames)):
+            for i in tqdm(range(num_frames)):
                 R, t = look_at_view_transform(3., -10, degrees[i])
-                rasterizer, renderer = create_pcd_renderer(h, w, intrinsic.squeeze()[:3, :3],
+                renderer = create_pcd_renderer(H, W, intrinsic.squeeze()[:3, :3],
                                                            R=R, T=t,
                                                            radius=radius, device=device)
                 result = renderer(pcd)
@@ -415,6 +417,7 @@ class VisualizationDemo(object):
                 frame = (255. * result.detach().cpu().squeeze().permute(1, 2, 0).numpy()).astype(np.uint8)
                 frames.append(frame)
 
-            video_out_file = '{}.mp4'.format(name)
-            imageio.mimwrite(video_out_file, frames, fps=25, quality=8)
+            video_out_file = '{}.gif'.format(name)
+            imageio.mimwrite(video_out_file, frames, fps=25)
+            # imageio.mimwrite(video_out_file, frames, fps=25, quality=8)
             

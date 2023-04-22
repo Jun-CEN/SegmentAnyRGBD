@@ -17,7 +17,12 @@ In this repo, we provide two alternatives for the users, including feeding the R
 <img src="resources/flowchart.png" width="100%">
 </p>
 
-
+## Demos
+### Sailvos3D Dataset
+| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visulization |
+| :---: | :---:| :---:|
+| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_rgb_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/000160_depth_3d_sam_mask.gif" width="100%">|
 ## Installation    
 
 Please see [installation guide](./INSTALL.md).
