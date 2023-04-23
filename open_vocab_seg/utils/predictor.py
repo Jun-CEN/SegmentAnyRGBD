@@ -6,6 +6,7 @@ import torch
 import torchvision
 import imageio
 from tqdm import tqdm
+import os
 
 from pytorch3d.structures import Pointclouds
 from pytorch3d.renderer import look_at_view_transform
@@ -187,7 +188,7 @@ class VisualizationDemo(object):
         
         return predictions, vis_output
     
-    def run_on_image_sam(self, path, class_names):
+    def run_on_image_sam(self, path, class_names, depth_map_path, rage_matrices_path):
         """
         Args:
             path (str): the path of the image
@@ -223,13 +224,13 @@ class VisualizationDemo(object):
         masks_rgb = mask_generator_2.generate(image)
 
         print('Using SAM to generate segments for the Depth map')
-        d, world_coord = self.project_2d_to_3d(path)
+        d, world_coord = self.project_2d_to_3d(depth_map_path, rage_matrices_path)
         d = (d - np.min(d)) / (np.max(d) - np.min(d))
         image_depth = mpl.colormaps['plasma'](d)*255
         plt.figure()
         plt.imshow(image_depth.astype(np.uint8))
         plt.axis('off')
-        plt.savefig('Depth_rendered.png')
+        plt.savefig('outputs/Depth_rendered.png', bbox_inches='tight', pad_inches=0.0)
         masks_depth = mask_generator_2.generate(image_depth.astype(np.uint8)[:,:,:-1])
 
         if "sem_seg" in predictions:
@@ -268,7 +269,7 @@ class VisualizationDemo(object):
         
         return predictions, vis_output_rgb, vis_output_depth, vis_output_rgb_sam, vis_output_depth_sam
     
-    def project_2d_to_3d(self, image_path):
+    def project_2d_to_3d(self, depth_map_path, rage_matrices_path):
 
         H = 800
         W = 1280
@@ -281,9 +282,8 @@ class VisualizationDemo(object):
             x = (2 / s_x) * xx - 1
             y = (-2 / s_y) * yy + 1
             return x, y
-        dataset_root = image_path[:-18]
-        frameId = image_path[-10:-4]
-        rage_matrices = np.load(dataset_root+'/rage_matrices/{}.npz'.format(frameId))
+
+        rage_matrices = np.load(rage_matrices_path)
 
 
         # get the (ViewProj) matrix that transform points from the world coordinate to NDC
@@ -297,7 +297,7 @@ class VisualizationDemo(object):
         P_inverse = rage_matrices['P_inv'] # NDC to camera coordinate
         # print(VP, VP_inverse, P, P_inverse)
 
-        d = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
+        d = np.load(depth_map_path)
         d = d/6.0 - 4e-5 # convert to NDC coordinate
 
         px = np.arange(0, W)
@@ -318,7 +318,7 @@ class VisualizationDemo(object):
 
         return d, world_coord
 
-    def get_xyzrgb(self, rgb_path, image_path):
+    def get_xyzrgb(self, rgb_path, depth_path, rage_matrices_path):
 
         H = 800
         W = 1280
@@ -331,9 +331,8 @@ class VisualizationDemo(object):
             x = (2 / s_x) * xx - 1
             y = (-2 / s_y) * yy + 1
             return x, y
-        dataset_root = image_path[:-18]
-        frameId = image_path[-10:-4]
-        rage_matrices = np.load(dataset_root+'/rage_matrices/{}.npz'.format(frameId))
+        
+        rage_matrices = np.load(rage_matrices_path)
 
 
         # get the (ViewProj) matrix that transform points from the world coordinate to NDC
@@ -347,7 +346,7 @@ class VisualizationDemo(object):
         P_inverse = rage_matrices['P_inv'] # NDC to camera coordinate
         # print(VP, VP_inverse, P, P_inverse)
 
-        d = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
+        d = np.load(depth_path)
         d = d/6.0 - 4e-5 # convert to NDC coordinate
 
         px = np.arange(0, W)
@@ -374,13 +373,12 @@ class VisualizationDemo(object):
 
         return xyzrgb
     
-    def render_3d_video(self, xyzrgb_path, image_path):
-        dataset_root = image_path[:-18]
-        frameId = image_path[-10:-4]
+    def render_3d_video(self, xyzrgb_path, depth_path):
+        
         device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
         
         xyzrgb = np.load(xyzrgb_path)
-        depth = np.load(dataset_root+'/depth/{}.npy'.format(frameId))
+        depth = np.load(depth_path)
         depth = torch.tensor(depth).to(device)
         depth = 1 / depth
         
@@ -418,6 +416,8 @@ class VisualizationDemo(object):
                 frames.append(frame)
 
             video_out_file = '{}.gif'.format(name)
-            imageio.mimwrite(video_out_file, frames, fps=25)
-            # imageio.mimwrite(video_out_file, frames, fps=25, quality=8)
+            imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25)
+            
+            # video_out_file = '{}.mp4'.format(name)
+            # imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
             
