@@ -474,13 +474,10 @@ class VisualizationDemoIndoor(VisualizationDemo):
         masks_rgb = mask_generator_2.generate(image)
 
         print('Using SAM to generate segments for the Depth map')
-        print('D1: ', depth_img.shape)  
         d = np.full(depth_img.shape, 0, dtype=float)
         d[depth_mask] = (1 / (depth_img+1e-6))[depth_mask]
-        print('D2: ', d.shape)
         colored_depth = (d - np.min(d)) / (np.max(d) - np.min(d))
         colored_depth = mpl.colormaps['inferno'](colored_depth)*255
-        print('D3: ', colored_depth.shape)
         plt.figure()
         plt.imshow(colored_depth.astype(np.uint8)[:,:,:-1])
         plt.axis('off')

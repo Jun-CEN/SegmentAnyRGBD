@@ -192,7 +192,6 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
         gr.Markdown("<div align='center'> <h2> Semantic Segment AnyRGBD </span> </h2> \
                      <a style='font-size:18px;color: #000000' href='https://github.com/Jun-CEN/SegmentAnyRGBD'> Github </div>")
         
-        gr.Markdown("<b> You may duplicate the space and upgrade to GPU in settings for better performance and faster inference without waiting in the queue. <a style='display:inline-block' href='https://huggingface.co/spaces/VideoCrafter/VideoCrafter?duplicate=true'> <img src='https://bit.ly/3gLdBN6' alt='Duplicate Space'></a> </b>")
         #######t2v#######
         with gr.Tab(label="Dataset: Sailvos3D"):
             with gr.Column():
