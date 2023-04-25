@@ -25,6 +25,14 @@ In this repo, we provide two alternatives for the users, including feeding the R
 | <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/depth_3d_sam_mask.gif" width="100%">|
 | <img src="resources/demos/sailvos_2/000540.bmp" width="100%"> | <img src="resources/demos/sailvos_2/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/rgb_3d_sam_mask.gif" width="100%">|
 | <img src="resources/demos/sailvos_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/sailvos_2/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/depth_3d_sam_mask.gif" width="100%">|
+
+### ScannetV2 Dataset
+| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visualization |
+| :---: | :---:| :---:|
+| <img src="resources/demos/scannet_1/5560.jpg" width="100%"> | <img src="resources/demos/scannet_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_1/rgb_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/scannet_1/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_1/depth_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/scannet_2/1660.jpg" width="100%"> | <img src="resources/demos/scannet_2/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_2/rgb_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/scannet_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_2/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_2/depth_3d_sam_mask.gif" width="100%">|
 ## Installation    
 
 Please see [installation guide](./INSTALL.md).
