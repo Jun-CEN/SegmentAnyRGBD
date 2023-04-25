@@ -8,3 +8,5 @@ fire
 opencv-python
 pandas
 imageio
+imageio[ffmpeg]
+imageio[pyav]

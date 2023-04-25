@@ -10,6 +10,7 @@ import cv2
 import tqdm
 import numpy as np
 import gradio as gr
+from tools.util import *
 
 from detectron2.config import get_cfg
 
@@ -18,7 +19,7 @@ from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
 from open_vocab_seg import add_ovseg_config
 
-from open_vocab_seg.utils import VisualizationDemo
+from open_vocab_seg.utils import VisualizationDemo, VisualizationDemoIndoor
 
 # constants
 WINDOW_NAME = "Open vocabulary segmentation"
@@ -73,7 +74,7 @@ def get_parser():
 
 args = get_parser().parse_args()
 
-def greet(rgb_input, depth_map_input, rage_matrices_input, class_candidates):
+def greet_sailvos3d(rgb_input, depth_map_input, rage_matrices_input, class_candidates):
     print(args.class_names)
     print(class_candidates[0], class_candidates[1], class_candidates[2], class_candidates[3],)
     print(class_candidates.split(', '))
@@ -142,6 +143,51 @@ def greet(rgb_input, depth_map_input, rage_matrices_input, class_candidates):
     RGB_Semantic_SAM_Mask_gif = 'outputs/rgb_3d_sam_mask.gif'
     return RGB_Semantic_SAM_Mask, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_Mask, Depth_Semantic_SAM_Mask_gif
 
+def greet_scannet(rgb_input, depth_map_input, class_candidates):
+    rgb_input = rgb_input
+    depth_map_input = depth_map_input.name
+    class_candidates = class_candidates.split(', ')
+    print(rgb_input, depth_map_input, class_candidates)
+    mp.set_start_method("spawn", force=True)
+    args = get_parser().parse_args()
+    setup_logger(name="fvcore")
+    logger = setup_logger()
+    logger.info("Arguments: " + str(args))
+
+    cfg = setup_cfg(args)
+
+    demo = VisualizationDemoIndoor(cfg)
+    from datasets.scannet_preprocess.meta_data.scannet200_constants import CLASS_LABELS_200
+    class_names = list(CLASS_LABELS_200)
+    """ args.input = glob.glob(os.path.expanduser(args.input[0]))
+    assert args.input, "The input path(s) was not found" """
+    start_time = time.time()
+    predictions, output2D, output3D = demo.run_on_pcd_ui(rgb_input, depth_map_input, class_candidates)
+
+    output2D['sem_seg_on_rgb'].save('outputs/RGB_Semantic_SAM.png')
+    output2D['sem_seg_on_depth'].save('outputs/Depth_Semantic_SAM.png')
+    output2D['sam_seg_on_rgb'].save('outputs/RGB_Semantic_SAM_Mask.png')
+    output2D['sam_seg_on_depth'].save('outputs/Depth_Semantic_SAM_Mask.png')
+    """ rgb_3d_sam = demo.get_xyzrgb('outputs/RGB_Semantic_SAM.png', path)
+    depth_3d_sam = demo.get_xyzrgb('outputs/Depth_Semantic_SAM.png', path)
+    rgb_3d_sam_mask = demo.get_xyzrgb('outputs/RGB_Semantic_SAM_Mask.png', path)
+    depth_3d_sam_mask = demo.get_xyzrgb(outputs/'Depth_Semantic_SAM_Mask.png', path) """
+    rgb_3d_sem = output3D['rgb_3d_sem']
+    depth_3d_sem = output3D['depth_3d_sem']
+    rgb_3d_sam = output3D['rgb_3d_sam']
+    depth_3d_sam = output3D['depth_3d_sam']
+    
+    np.savez('outputs/xyzrgb.npz', rgb_3d_sam = rgb_3d_sem, depth_3d_sam = depth_3d_sem, rgb_3d_sam_mask = rgb_3d_sam, depth_3d_sam_mask = depth_3d_sam)
+    demo.render_3d_video('outputs/xyzrgb.npz')
+
+    Depth_Semantic_SAM_Mask = read_image('outputs/Depth_Semantic_SAM_Mask.png')
+    RGB_Semantic_SAM_Mask = read_image('outputs/RGB_Semantic_SAM_Mask.png')
+    Depth_map = read_image('outputs/Depth_rendered.png')
+    Depth_Semantic_SAM_Mask_gif = 'outputs/depth_3d_sam_mask.gif'
+    RGB_Semantic_SAM_Mask_gif = 'outputs/rgb_3d_sam_mask.gif'
+    return RGB_Semantic_SAM_Mask, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_Mask, Depth_Semantic_SAM_Mask_gif
+
+
 with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
         gr.Markdown("<div align='center'> <h2> Semantic Segment AnyRGBD </span> </h2> \
                      <a style='font-size:18px;color: #000000' href='https://github.com/Jun-CEN/SegmentAnyRGBD'> Github </div>")
@@ -184,10 +230,48 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
                         ]],
                             inputs=[Input_RGB_Component, Depth_Map_Input_Component, Component_2D_to_3D_Projection_Parameters, Class_Candidates_Component],
                             outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
-                            fn=greet)
+                            fn=greet_sailvos3d)
             vc_end_btn.click(inputs=[Input_RGB_Component, Depth_Map_Input_Component, Component_2D_to_3D_Projection_Parameters, Class_Candidates_Component],
                             outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
-                            fn=greet)
+                            fn=greet_sailvos3d)
+        
+        with gr.Tab(label="Dataset: Scannet"):
+            with gr.Column():
+                with gr.Row():
+                    # with gr.Tab(label='input'):
+                    with gr.Column():
+                        with gr.Row():
+                            Input_RGB_Component = gr.Image(label = 'RGB_Input', type = 'filepath').style(width=320, height=200)
+                            Depth_Map_Output_Component = gr.Image(label = "Depth_Map").style(width=320, height=200)
+                        with gr.Row():
+                            Depth_Map_Input_Component = gr.File(label = "Depth_Map")
+                            Class_Candidates_Component = gr.Text(label = 'Class_Candidates')
+                        vc_end_btn = gr.Button("Send")
+                    with gr.Tab(label='Result'):
+                        with gr.Row():
+                            RGB_Semantic_SAM_Mask_Component = gr.Image(label = "RGB_Semantic_SAM_Mask").style(width=320, height=200)
+                            RGB_Semantic_SAM_Mask_3D_Component = gr.Image(label = "3D_RGB_Semantic_SAM_Mask").style(width=320, height=200)
+                        with gr.Row():
+                            Depth_Semantic_SAM_Mask_Component = gr.Image(label = "Depth_Semantic_SAM_Mask").style(width=320, height=200)
+                            Depth_Semantic_SAM_Mask_3D_Component = gr.Image(label = "3D_Depth_Semantic_SAM_Mask").style(width=320, height=200)
+                gr.Examples(examples=[
+                        [
+                            'UI/scannetv2/examples/scene0000_00/color/1660.jpg',
+                            'UI/scannetv2/examples/scene0000_00/depth/1660.png',
+                            'wall, floor, cabinet, bed, chair, sofa, table, door, window, bookshelf, picture, counter, desk, curtain, refrigerator, shower curtain, toilet, sink, bathtub, other furniture',
+                        ],
+                        [
+                            'UI/scannetv2/examples/scene0000_00/color/5560.jpg',
+                            'UI/scannetv2/examples/scene0000_00/depth/5560.png',
+                            'wall, floor, cabinet, bed, chair, sofa, table, door, window, bookshelf, picture, counter, desk, curtain, refrigerator, shower curtain, toilet, sink, bathtub, other furniture',
+                        ]],
+                            inputs=[Input_RGB_Component, Depth_Map_Input_Component, Class_Candidates_Component],
+                            outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
+                            fn=greet_scannet)
+            vc_end_btn.click(inputs=[Input_RGB_Component, Depth_Map_Input_Component, Class_Candidates_Component],
+                            outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
+                            fn=greet_scannet)
+
 
 demo = segrgbd_iface
 demo.launch()

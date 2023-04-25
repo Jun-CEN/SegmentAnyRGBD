@@ -12,7 +12,7 @@ MODEL:
     DROP_PATH_RATE: 0.3
     PATCH_NORM: True
     PRETRAIN_IMG_SIZE: 384
-  WEIGHTS: "swin_base_patch4_window12_384_22k.pkl"
+  WEIGHTS: "ovseg_swinbase_vitL14_ft_mpt.pth"
   PIXEL_MEAN: [123.675, 116.280, 103.530]
   PIXEL_STD: [58.395, 57.120, 57.375]
   SEM_SEG_HEAD:

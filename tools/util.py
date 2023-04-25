@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-import open3d as o3d
 import os
 import copy
 from PIL import Image
