@@ -418,6 +418,6 @@ class VisualizationDemo(object):
             video_out_file = '{}.gif'.format(name)
             imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25)
             
-            # video_out_file = '{}.mp4'.format(name)
-            # imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
+            video_out_file = '{}.mp4'.format(name)
+            imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
             
