@@ -80,13 +80,9 @@ class VisualizationDemoIndoor(VisualizationDemo):
         print('Using SAM to generate segments for the RGB image')
         masks_rgb = mask_generator_2.generate(image)
 
-        print('Using SAM to generate segments for the Depth map')
-        print(depth_img.shape, depth_img.max())
-        #colored_depth = depth_img / 2**16
-        
+        print('Using SAM to generate segments for the Depth map')  
         d = np.full(depth_img.shape, 0, dtype=float)
         d[depth_mask] = (1 / (depth_img+1e-6))[depth_mask]
-        print(depth_mask.sum(), d.max())
         colored_depth = (d - np.min(d)) / (np.max(d) - np.min(d))
         colored_depth = mpl.colormaps['inferno'](colored_depth)*255
         plt.figure()
@@ -153,10 +149,10 @@ class VisualizationDemoIndoor(VisualizationDemo):
         uv_depth[:,:,2] = depth_img/depth_shift
 
         output3D = {}
-        output3D['rgb_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2)
-        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2)
-        output3D['rgb_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_rgb'].get_image()), axis=2)
-        output3D['depth_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_depth'].get_image()), axis=2)
+        output3D['rgb_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
+        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
+        output3D['rgb_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
+        output3D['depth_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_depth'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
 
         uv_depth = np.reshape(uv_depth, [-1,3])
         uv_depth = uv_depth[np.where(uv_depth[:,2]!=0),:].squeeze()
@@ -262,9 +258,9 @@ def get_parser():
 
     parser.add_argument('--rgb_path', type=str, help='the path of rgb data')
     parser.add_argument('--data_path', type=str, default='', help='the path of pointcload data')
+    parser.add_argument('--color_name', type=str, default='', help='the name of segment image')
+    parser.add_argument('--merge_pcd', action ='store_true', help='merge point cloud or not')
     parser.add_argument('--save_path', type=str, help='Where to save the pcd results')
-    parser.add_argument('--save_2dmask_path', type=str, default='', help='Where to save 2D segmentation result from SAM')
-    parser.add_argument('--sam_checkpoint_path', type=str, default='', help='the path of checkpoint for SAM')
     parser.add_argument('--scannetv2_train_path', type=str, default='datasets/scannet_preprocess/meta_data/scannetv2_train.txt', help='the path of scannetv2_train.txt')
     parser.add_argument('--scannetv2_val_path', type=str, default='datasets/scannet_preprocess/meta_data/scannetv2_val.txt', help='the path of scannetv2_val.txt')
     parser.add_argument('--img_size', default=[640,480])
@@ -297,10 +293,12 @@ if __name__ == "__main__":
                 # use PIL, to be consistent with evaluation
                 if os.path.exists(os.path.join(args.save_path, scene_name + ".pth")):
                     continue
-                color_names = sorted(os.listdir(os.path.join(args.rgb_path, scene_name, 'color')), key=lambda a: int(os.path.basename(a).split('.')[0]), reverse=True)
+                if args.color_name == '':
+                    color_names = sorted(os.listdir(os.path.join(args.rgb_path, scene_name, 'color')), key=lambda a: int(os.path.basename(a).split('.')[0]), reverse=True)
+                else: 
+                    color_names = [args.color_name]
                 pcd_list = []
                 for i, color_name in enumerate(color_names):
-                    if i>5: break
                     path = os.path.join(args.rgb_path, scene_name, 'color', color_name)
                     start_time = time.time()
                     print(color_name, flush=True)
@@ -348,17 +346,17 @@ if __name__ == "__main__":
                         cv2.imshow(WINDOW_NAME, output2D['sem_seg_on_rgb'].get_image()[:, :, ::-1])
                         if cv2.waitKey(0) == 27:
                             break  # esc to quit
-                
-                with open(args.scannetv2_train_path) as train_file:
-                    train_scenes = train_file.read().splitlines()
-                with open(args.scannetv2_val_path) as val_file:
-                    val_scenes = val_file.read().splitlines()
+                if args.merge_pcd:
+                    with open(args.scannetv2_train_path) as train_file:
+                        train_scenes = train_file.read().splitlines()
+                    with open(args.scannetv2_val_path) as val_file:
+                        val_scenes = val_file.read().splitlines()
 
-                if scene_name in train_scenes:
-                    scene_path = os.path.join(args.data_path, "train", scene_name + ".pth")
-                elif scene_name in val_scenes:
-                    scene_path = os.path.join(args.data_path, "val", scene_name + ".pth")
+                    if scene_name in train_scenes:
+                        scene_path = os.path.join(args.data_path, "train", scene_name + ".pth")
+                    elif scene_name in val_scenes:
+                        scene_path = os.path.join(args.data_path, "val", scene_name + ".pth")
 
-                demo.merge_pcd(pcd_list, args.data_path, args.save_path, scene_path, args.voxel_size, args.th)
+                    demo.merge_pcd(pcd_list, args.data_path, args.save_path, scene_path, args.voxel_size, args.th)
     else:
         raise NotImplementedError
