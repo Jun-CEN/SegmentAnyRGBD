@@ -4,6 +4,7 @@ import os
 import copy
 from PIL import Image
 import json
+import imageio
 # import clip
 
 
@@ -274,3 +275,22 @@ def group_sem_voting(semantic_label, seg_result, instance_num=0):
         sem_map[mask] = seg_label_n
     
     return sem_map
+
+def two_image_to_gif(image_1, image_2, name):
+    num_begin = 30
+    num_frames = 30
+    num_end = 30
+    frames = []
+    for i in range(num_begin):
+        frames.append(image_1)
+    for i in range(num_frames):
+        image_tmp = image_1 + (image_2 - image_1) * (i / (num_frames - 1))
+        frames.append(image_tmp.astype(np.uint8))
+    for i in range(num_end):
+        frames.append(image_2)
+        
+    video_out_file = '{}.gif'.format(name)
+    imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25)
+    
+    video_out_file = '{}.mp4'.format(name)
+    imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)

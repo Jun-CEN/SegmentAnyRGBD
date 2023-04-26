@@ -5,12 +5,12 @@
 - Authors: [Jun Cen](https://cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/), [Yixuan Pei](https://github.com/peiyixuan), [Lingdong Kong](https://ldkong.com/)
 - Institutes: The Hong Kong University of Science and Technology, Huazhong University of Science and Technology, Nanyang Technological University, Xi'an Jiaotong University, National University of Singapore
 
-🎉🎉🎉 Welcome to the Segment AnyRGBD GitHub repository! 🎉🎉🎉  
+🎉🎉🎉 Welcome to the Segment Any RGBD GitHub repository! 🎉🎉🎉  
 ***
 🤗🤗🤗 Segment AnyRGBD is a toolbox to segment **rendered depth images** based on SAM! Don't forget to star this repo if you find it interesting!  
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/jcenaa/Semantic_Segment_AnyRGBD)
-## 🤩 Introduction
-We find that humans can naturally identify objects from the visulization of the depth map, so we first map the depth map ([H, W]) to the RGB space ([H, W, 3]) by a [colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html#lightness-of-matplotlib-colormaps) function, and then feed the **rendered depth image** into SAM. Compared to the RGB image, the rendered depth image ignores the texture information and focuses on the **geometry** information. The input images to SAM are all **RGB** images in SAM-based projects like [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything), [Anything-3D](https://github.com/Anything-of-anything/Anything-3D), and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D). We are the first to use SAM to extract the geometry information directly. The following figures show that the SAM segments the table into 4 parts based on the RGB image, but segments the table as a whole object when inputs are rendered depth images.
+## 🥳 Introduction
+We find that humans can naturally identify objects from the visulization of the depth map, so we first map the depth map ([H, W]) to the RGB space ([H, W, 3]) by a [colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html#lightness-of-matplotlib-colormaps) function, and then feed the **rendered depth image** into SAM. Compared to the RGB image, the rendered depth image ignores the texture information and focuses on the **geometry** information. The input images to SAM are all **RGB** images in SAM-based projects like [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything), [Anything-3D](https://github.com/Anything-of-anything/Anything-3D), and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D). We are the first to use SAM to extract the geometry information directly. The following figures show that depth maps with different colormap functions has different SAM results.
 <p align="center">
 <img src="resources/examples_2.png" width="100%">
 </p>
@@ -20,25 +20,35 @@ We find that humans can naturally identify objects from the visulization of the 
 In this repo, we provide two alternatives for the users, including feeding the RGB images or rendered depth images to the SAM. In each mode, the user could obtain the semantic masks (one color refers to one class) and the SAM masks with the class. The overall structure is shown in the following figure. We use [OVSeg](https://github.com/facebookresearch/ov-seg) for zero-shot semantic segmentation.
 
 <p align="center">
-<img src="resources/flowchart_2.png" width="100%">
+<img src="resources/flowchart_3.png" width="100%">
+</p>
+
+## 🤩 Comparison
+
+- RGB images mainly represents the texture information and depth images contains the geometry information, so the RGB images are more colorful than the rendered depth image.  In this case, SAM provides much more masks for RGB inputs than depth inputs, as shown in the following figure.
+- The rendered depth image alleviates the over-segment results of SAM. For example, the table is segmented as four parts on the RGB images, and one of them is classified as the chair in the semantic results (yellow circles in the following figure). In contrast, the table is regarded as a whole object on the depth image and correctly-classified. A part of the head of a human is classified as the wall on the RGB image (blue circles in the following figure), but it is well classified on the depth image.
+- Two objects which are very close may be segmented as one object on the depth image, such as the chair in the red circle. In this case, texture information in the RGB images are essential to find out the object.
+
+<p align="center">
+<img src="resources/comparison.png" width="80%">
 </p>
 
 ## 🔥 Demos
 ### Sailvos3D Dataset
-| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visualization |
+| Input to SAM (RGB or Rendered Depth Image) |  SAM Masks with Class and Semantic Masks| 3D Visualization for SAM Masks with Class and Semantic Masks|
 | :---: | :---:| :---:|
-| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/rgb_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_1/depth_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/sailvos_2/000540.bmp" width="100%"> | <img src="resources/demos/sailvos_2/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/rgb_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/sailvos_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/sailvos_2/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/sailvos_2/depth_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/Depth_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_2/000540.bmp" width="100%"> | <img src="resources/demos/sailvos_2/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_2/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_2/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_2/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_2/Depth_3D_All.gif" width="100%">|
 
 ### ScannetV2 Dataset
-| Input (RGB or Rendered Depth Image) | SAM Masks with Class| 3D Visualization |
+| Input to SAM (RGB or Rendered Depth Image) |  SAM Masks with Class and Semantic Masks| 3D Visualization for SAM Masks with Class and Semantic Masks|
 | :---: | :---:| :---:|
-| <img src="resources/demos/scannet_1/5560.jpg" width="100%"> | <img src="resources/demos/scannet_1/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_1/rgb_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/scannet_1/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_1/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_1/depth_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/scannet_2/1660.jpg" width="100%"> | <img src="resources/demos/scannet_2/RGB_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_2/rgb_3d_sam_mask.gif" width="100%">|
-| <img src="resources/demos/scannet_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_2/Depth_Semantic_SAM_Mask.png" width="100%" >| <img src="resources/demos/scannet_2/depth_3d_sam_mask.gif" width="100%">|
+| <img src="resources/demos/scannet_1/5560.jpg" width="100%"> | <img src="resources/demos/scannet_1/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/scannet_1/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/scannet_1/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_1/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/scannet_1/Depth_3D_All.gif" width="100%">|
+| <img src="resources/demos/scannet_2/1660.jpg" width="100%"> | <img src="resources/demos/scannet_2/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/scannet_2/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/scannet_2/Depth_rendered.png" width="100%"> | <img src="resources/demos/scannet_2/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/scannet_2/Depth_3D_All.gif" width="100%">|
 
 ## ⚙️ Installation    
 

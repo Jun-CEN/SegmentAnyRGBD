@@ -138,10 +138,16 @@ def greet_sailvos3d(rgb_input, depth_map_input, rage_matrices_input, class_candi
     
     Depth_Semantic_SAM_Mask = read_image('outputs/Depth_Semantic_SAM_Mask.png')
     RGB_Semantic_SAM_Mask = read_image('outputs/RGB_Semantic_SAM_Mask.png')
+    Depth_Semantic_SAM = read_image('outputs/Depth_Semantic_SAM.png')
+    RGB_Semantic_SAM = read_image('outputs/RGB_Semantic_SAM.png')
+    two_image_to_gif(Depth_Semantic_SAM_Mask, Depth_Semantic_SAM, 'Depth_Semantic_SAM_2D')
+    two_image_to_gif(RGB_Semantic_SAM_Mask, RGB_Semantic_SAM, 'RGB_Semantic_SAM_2D')
+    Depth_Semantic_SAM_2D = 'outputs/Depth_Semantic_SAM_2D.gif'
+    RGB_Semantic_SAM_2D = 'outputs/RGB_Semantic_SAM_2D.gif'
     Depth_map = read_image('outputs/Depth_rendered.png')
-    Depth_Semantic_SAM_Mask_gif = 'outputs/depth_3d_sam_mask.gif'
-    RGB_Semantic_SAM_Mask_gif = 'outputs/rgb_3d_sam_mask.gif'
-    return RGB_Semantic_SAM_Mask, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_Mask, Depth_Semantic_SAM_Mask_gif
+    Depth_Semantic_SAM_Mask_gif = 'outputs/Depth_3D_All.gif'
+    RGB_Semantic_SAM_Mask_gif = 'outputs/RGB_3D_All.gif'
+    return RGB_Semantic_SAM_2D, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_2D, Depth_Semantic_SAM_Mask_gif
 
 def greet_scannet(rgb_input, depth_map_input, class_candidates):
     rgb_input = rgb_input
@@ -182,10 +188,16 @@ def greet_scannet(rgb_input, depth_map_input, class_candidates):
 
     Depth_Semantic_SAM_Mask = read_image('outputs/Depth_Semantic_SAM_Mask.png')
     RGB_Semantic_SAM_Mask = read_image('outputs/RGB_Semantic_SAM_Mask.png')
+    Depth_Semantic_SAM = read_image('outputs/Depth_Semantic_SAM.png')
+    RGB_Semantic_SAM = read_image('outputs/RGB_Semantic_SAM.png')
+    two_image_to_gif(Depth_Semantic_SAM_Mask, Depth_Semantic_SAM, 'Depth_Semantic_SAM_2D')
+    two_image_to_gif(RGB_Semantic_SAM_Mask, RGB_Semantic_SAM, 'RGB_Semantic_SAM_2D')
+    Depth_Semantic_SAM_2D = 'outputs/Depth_Semantic_SAM_2D.gif'
+    RGB_Semantic_SAM_2D = 'outputs/RGB_Semantic_SAM_2D.gif'
     Depth_map = read_image('outputs/Depth_rendered.png')
-    Depth_Semantic_SAM_Mask_gif = 'outputs/depth_3d_sam_mask.gif'
-    RGB_Semantic_SAM_Mask_gif = 'outputs/rgb_3d_sam_mask.gif'
-    return RGB_Semantic_SAM_Mask, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_Mask, Depth_Semantic_SAM_Mask_gif
+    Depth_Semantic_SAM_Mask_gif = 'outputs/Depth_3D_All.gif'
+    RGB_Semantic_SAM_Mask_gif = 'outputs/RGB_3D_All.gif'
+    return RGB_Semantic_SAM_2D, RGB_Semantic_SAM_Mask_gif, Depth_map, Depth_Semantic_SAM_2D, Depth_Semantic_SAM_Mask_gif
 
 
 with gr.Blocks(analytics_enabled=False) as segrgbd_iface:

@@ -223,6 +223,7 @@ class VisualizationDemo(object):
         )
         print('Using SAM to generate segments for the RGB image')
         masks_rgb = mask_generator_2.generate(image)
+        masks_rgb = sorted(masks_rgb, key=(lambda x: x['area']), reverse=True)
 
         print('Using SAM to generate segments for the Depth map')
         d, world_coord = self.project_2d_to_3d(depth_map_path, rage_matrices_path)
@@ -233,6 +234,7 @@ class VisualizationDemo(object):
         plt.axis('off')
         plt.savefig('outputs/Depth_rendered.png', bbox_inches='tight', pad_inches=0.0)
         masks_depth = mask_generator_2.generate(image_depth.astype(np.uint8)[:,:,:-1])
+        masks_depth = sorted(masks_depth, key=(lambda x: x['area']), reverse=True)
 
         if "sem_seg" in predictions:
             r = predictions["sem_seg"]
@@ -241,7 +243,7 @@ class VisualizationDemo(object):
             
             pred_mask_sam_rgb = pred_mask.copy()
             for mask in masks_rgb:
-                cls_tmp, cls_num = np.unique(pred_mask_sam_rgb[mask['segmentation']], return_counts=True)
+                cls_tmp, cls_num = np.unique(pred_mask[mask['segmentation']], return_counts=True)
                 pred_mask_sam_rgb[mask['segmentation']] = cls_tmp[np.argmax(cls_num)]
                 mask['class'] = cls_tmp[np.argmax(cls_num)]
 
@@ -254,7 +256,7 @@ class VisualizationDemo(object):
 
             pred_mask_sam_depth = pred_mask.copy()
             for mask in masks_depth:
-                cls_tmp, cls_num = np.unique(pred_mask_sam_depth[mask['segmentation']], return_counts=True)
+                cls_tmp, cls_num = np.unique(pred_mask[mask['segmentation']], return_counts=True)
                 pred_mask_sam_depth[mask['segmentation']] = cls_tmp[np.argmax(cls_num)]
                 mask['class'] = cls_tmp[np.argmax(cls_num)]
 
@@ -401,6 +403,7 @@ class VisualizationDemo(object):
         degrees = np.linspace(120, 220, num_frames)
         
         total = ['rgb_3d_sam', 'depth_3d_sam', 'rgb_3d_sam_mask', 'depth_3d_sam_mask']
+        frames_all = {}
         
         for j, name in enumerate(total):
             img = torch.from_numpy(xyzrgb[name][:, 3:] / 255.).to(device).float()
@@ -415,12 +418,20 @@ class VisualizationDemo(object):
                 result = result.permute(0, 3, 1, 2)
                 frame = (255. * result.detach().cpu().squeeze().permute(1, 2, 0).numpy()).astype(np.uint8)
                 frames.append(frame)
+            
+            frames_all[name] = frames
 
             video_out_file = '{}.gif'.format(name)
             imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25)
             
-            video_out_file = '{}.mp4'.format(name)
-            imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
+            # video_out_file = '{}.mp4'.format(name)
+            # imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
+            
+        video_out_file = '{}.gif'.format('RGB_3D_All')
+        imageio.mimwrite(os.path.join('outputs', video_out_file), frames_all['rgb_3d_sam_mask']+frames_all['rgb_3d_sam'], fps=25)
+        
+        video_out_file = '{}.gif'.format('Depth_3D_All')
+        imageio.mimwrite(os.path.join('outputs', video_out_file), frames_all['depth_3d_sam_mask']+frames_all['depth_3d_sam'], fps=25)
             
 class VisualizationDemoIndoor(VisualizationDemo):
     def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False):
@@ -472,6 +483,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
         )
         print('Using SAM to generate segments for the RGB image')
         masks_rgb = mask_generator_2.generate(image)
+        masks_rgb = sorted(masks_rgb, key=(lambda x: x['area']), reverse=True)
 
         print('Using SAM to generate segments for the Depth map')
         d = np.full(depth_img.shape, 0, dtype=float)
@@ -483,6 +495,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
         plt.axis('off')
         plt.savefig('outputs/Depth_rendered.png')
         masks_depth = mask_generator_2.generate(colored_depth.astype(np.uint8)[:,:,:-1])
+        masks_depth = sorted(masks_depth, key=(lambda x: x['area']), reverse=True)
 
         if "sem_seg" in predictions:
             r = predictions["sem_seg"]
@@ -541,7 +554,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
 
         output3D = {}
         output3D['rgb_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
-        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
+        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_depth'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
         output3D['rgb_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
         output3D['depth_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_depth'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
         
@@ -585,6 +598,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
         )
         print('Using SAM to generate segments for the RGB image')
         masks_rgb = mask_generator_2.generate(image)
+        masks_rgb = sorted(masks_rgb, key=(lambda x: x['area']), reverse=True)
 
         print('Using SAM to generate segments for the Depth map')  
         d = np.full(depth_img.shape, 0, dtype=float)
@@ -596,6 +610,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
         plt.axis('off')
         plt.savefig('outputs/Depth_rendered.png')
         masks_depth = mask_generator_2.generate(colored_depth.astype(np.uint8)[:,:,:-1])
+        masks_depth = sorted(masks_depth, key=(lambda x: x['area']), reverse=True)
 
         if "sem_seg" in predictions:
             r = predictions["sem_seg"]
@@ -656,7 +671,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
 
         output3D = {}
         output3D['rgb_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
-        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
+        output3D['depth_3d_sem'] = np.stack((uv_depth, output2D['sem_seg_on_depth'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
         output3D['rgb_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_rgb'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
         output3D['depth_3d_sam'] = np.stack((uv_depth, output2D['sam_seg_on_depth'].get_image()), axis=2).reshape((depth_img.shape[0], depth_img.shape[1], 6))
 
@@ -746,6 +761,7 @@ class VisualizationDemoIndoor(VisualizationDemo):
         total = ['rgb_3d_sam', 'depth_3d_sam', 'rgb_3d_sam_mask', 'depth_3d_sam_mask']
         num_frames = 45
         degrees = np.linspace(120, 220, num_frames)
+        frames_all = {}
         for j, name in enumerate(total):
             img = torch.from_numpy(xyzrgb[name][:, :, 3:] / 255.).to(device).float()
             pcd = Pointclouds(points=[pts], features=[img.squeeze().reshape(-1, 3)])
@@ -761,9 +777,17 @@ class VisualizationDemoIndoor(VisualizationDemo):
                 result = result.permute(0, 3, 1, 2)
                 frame = (255. * result.detach().cpu().squeeze().permute(1, 2, 0).numpy()).astype(np.uint8)
                 frames.append(frame)
+            
+            frames_all[name] = frames
 
             video_out_file = '{}.gif'.format(name)
             imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25)
             
-            video_out_file = '{}.mp4'.format(name)
-            imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
+            # video_out_file = '{}.mp4'.format(name)
+            # imageio.mimwrite(os.path.join('outputs', video_out_file), frames, fps=25, quality=8)
+        
+        video_out_file = '{}.gif'.format('RGB_3D_All')
+        imageio.mimwrite(os.path.join('outputs', video_out_file), frames_all['rgb_3d_sam_mask']+frames_all['rgb_3d_sam'], fps=25)
+        
+        video_out_file = '{}.gif'.format('Depth_3D_All')
+        imageio.mimwrite(os.path.join('outputs', video_out_file), frames_all['depth_3d_sam_mask']+frames_all['depth_3d_sam'], fps=25)
