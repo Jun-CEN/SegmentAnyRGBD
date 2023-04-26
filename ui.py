@@ -212,9 +212,9 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
                     with gr.Column():
                         with gr.Row():
                             Input_RGB_Component = gr.Image(label = 'RGB_Input', type = 'filepath').style(width=320, height=200)
-                            Depth_Map_Output_Component = gr.Image(label = "Depth_Map").style(width=320, height=200)
+                            Depth_Map_Output_Component = gr.Image(label = "Vis_Depth_Map").style(width=320, height=200)
                         with gr.Row():
-                            Depth_Map_Input_Component = gr.File(label = 'Depth_map')
+                            Depth_Map_Input_Component = gr.File(label = 'Input_Depth_map')
                             Component_2D_to_3D_Projection_Parameters = gr.File(label = '2D_to_3D_Projection_Parameters')
                         with gr.Row():
                             Class_Candidates_Component = gr.Text(label = 'Class_Candidates')
@@ -253,9 +253,9 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
                     with gr.Column():
                         with gr.Row():
                             Input_RGB_Component = gr.Image(label = 'RGB_Input', type = 'filepath').style(width=320, height=200)
-                            Depth_Map_Output_Component = gr.Image(label = "Depth_Map").style(width=320, height=200)
+                            Depth_Map_Output_Component = gr.Image(label = "Vis_Depth_Map").style(width=320, height=200)
                         with gr.Row():
-                            Depth_Map_Input_Component = gr.File(label = "Depth_Map")
+                            Depth_Map_Input_Component = gr.File(label = "Input_Depth_Map")
                             Class_Candidates_Component = gr.Text(label = 'Class_Candidates')
                         vc_end_btn = gr.Button("Send")
                     with gr.Tab(label='Result'):

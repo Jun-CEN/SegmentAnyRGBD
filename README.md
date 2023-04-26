@@ -1,7 +1,8 @@
 <p align="center">
-<img src="resources/title_2.png" width="100%">
+<img src="resources/logo.png" width="100%">
 </p>  
 
+# SAD: Segment Any RGBD
 - Authors: [Jun Cen](https://cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/), [Yixuan Pei](https://github.com/peiyixuan), [Lingdong Kong](https://ldkong.com/)
 - Institutes: The Hong Kong University of Science and Technology, Huazhong University of Science and Technology, Nanyang Technological University, Xi'an Jiaotong University, National University of Singapore
 
