@@ -10,6 +10,7 @@
 ***
 🤗🤗🤗 Segment AnyRGBD is a toolbox to segment **rendered depth images** based on SAM! Don't forget to star this repo if you find it interesting!  
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/jcenaa/Semantic_Segment_AnyRGBD)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/mmlab-ntu/Segment-Any-RGBD)
 
 | Input to SAM (RGB or Rendered Depth Image) |  SAM Masks with Class and Semantic Masks| 3D Visualization for SAM Masks with Class and Semantic Masks|
 | :---: | :---:| :---:|
@@ -65,6 +66,7 @@ Please see [installation guide](./INSTALL.md).
 ## 💫 Try Demo
 ### 🤗 Try Demo on Huggingface
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/jcenaa/Semantic_Segment_AnyRGBD)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/mmlab-ntu/Segment-Any-RGBD)
 
 ### 🤗 Try Demo Locally
 We provide the UI (`ui.py`) and example inputs (`/UI/`) to reproduce the above demos. We use the OVSeg checkpoints [ovseg_swinbase_vitL14_ft_mpt.pth](https://drive.google.com/file/d/1cn-ohxgXDrDfkzC1QdO-fi8IjbjXmgKy/view?usp=sharing) for zero-shot semantic segmentation, and SAM checkpoints [sam_vit_h_4b8939.pth](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth). Put them under this repo. Simply try our UI on your own computer:
