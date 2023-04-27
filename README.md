@@ -4,12 +4,19 @@
 
 # SAD: Segment Any RGBD
 - Authors: [Jun Cen](https://cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/), [Yixuan Pei](https://github.com/peiyixuan), [Lingdong Kong](https://ldkong.com/)
-- Institutes: The Hong Kong University of Science and Technology, Huazhong University of Science and Technology, Nanyang Technological University, Xi'an Jiaotong University, National University of Singapore
+- Institutes: [Visual Intelligence Lab@HKUST](https://cqf.io/lab.html), [HUST](http://english.hust.edu.cn/), [MMLab@NTU](https://www.mmlab-ntu.com/), [Smiles Lab@XJTU](http://www.smiles-xjtu.com/), [NUS](https://nus.edu.sg/)
 
 🎉🎉🎉 Welcome to the Segment Any RGBD GitHub repository! 🎉🎉🎉  
 ***
 🤗🤗🤗 Segment AnyRGBD is a toolbox to segment **rendered depth images** based on SAM! Don't forget to star this repo if you find it interesting!  
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/jcenaa/Semantic_Segment_AnyRGBD)
+
+| Input to SAM (RGB or Rendered Depth Image) |  SAM Masks with Class and Semantic Masks| 3D Visualization for SAM Masks with Class and Semantic Masks|
+| :---: | :---:| :---:|
+| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/Depth_3D_All.gif" width="100%">|
+
+
 ## 🥳 Introduction
 We find that humans can naturally identify objects from the visulization of the depth map, so we first map the depth map ([H, W]) to the RGB space ([H, W, 3]) by a [colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html#lightness-of-matplotlib-colormaps) function, and then feed the **rendered depth image** into SAM. Compared to the RGB image, the rendered depth image ignores the texture information and focuses on the **geometry** information. The input images to SAM are all **RGB** images in SAM-based projects like [SSA](https://github.com/fudan-zvg/Semantic-Segment-Anything), [Anything-3D](https://github.com/Anything-of-anything/Anything-3D), and [SAM 3D](https://github.com/Pointcept/SegmentAnything3D). We are the first to use SAM to extract the geometry information directly. The following figures show that depth maps with different colormap functions has different SAM results.
 <p align="center">
@@ -38,8 +45,8 @@ In this repo, we provide two alternatives for the users, including feeding the R
 ### Sailvos3D Dataset
 | Input to SAM (RGB or Rendered Depth Image) |  SAM Masks with Class and Semantic Masks| 3D Visualization for SAM Masks with Class and Semantic Masks|
 | :---: | :---:| :---:|
-| <img src="resources/demos/sailvos_1/000160.bmp" width="100%"> | <img src="resources/demos/sailvos_1/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/RGB_3D_All.gif" width="100%">|
-| <img src="resources/demos/sailvos_1/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_1/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_1/Depth_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_3/rgb_000100.bmp" width="100%"> | <img src="resources/demos/sailvos_3/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_3/RGB_3D_All.gif" width="100%">|
+| <img src="resources/demos/sailvos_3/Depth_rendered.png" width="100%"> | <img src="resources/demos/sailvos_3/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_3/Depth_3D_All.gif" width="100%">|
 | <img src="resources/demos/sailvos_2/000540.bmp" width="100%"> | <img src="resources/demos/sailvos_2/RGB_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_2/RGB_3D_All.gif" width="100%">|
 | <img src="resources/demos/sailvos_2/Depth_plasma.png" width="100%"> | <img src="resources/demos/sailvos_2/Depth_Semantic_SAM_2D.gif" width="100%" >| <img src="resources/demos/sailvos_2/Depth_3D_All.gif" width="100%">|
 

@@ -238,7 +238,14 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
                             'UI/sailvos3d/ex2/inputs/depth_000540.npy',
                             'UI/sailvos3d/ex2/inputs/rage_matrices_000540.npz',
                             'person, car, motorcycle, truck, bird, dog, handbag, suitcase, bottle, cup, bowl, chair, potted plant, bed, dining table, tv, laptop, cell phone, bag, bin, box, door, road barrier, stick, lamp, floor, wall',
-                        ]],
+                        ],
+                        [
+                            'UI/sailvos3d/ex3/inputs/rgb_000100.bmp',
+                            'UI/sailvos3d/ex3/inputs/depth_000100.npy',
+                            'UI/sailvos3d/ex3/inputs/rage_matrices_000100.npz',
+                            'person, car, motorcycle, truck, bird, dog, handbag, suitcase, bottle, cup, bowl, chair, potted plant, bed, dining table, tv, laptop, cell phone, bag, bin, box, door, road barrier, stick, lamp, floor, wall',
+                        ],
+                        ],
                             inputs=[Input_RGB_Component, Depth_Map_Input_Component, Component_2D_to_3D_Projection_Parameters, Class_Candidates_Component],
                             outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
                             fn=greet_sailvos3d)
@@ -275,7 +282,18 @@ with gr.Blocks(analytics_enabled=False) as segrgbd_iface:
                             'UI/scannetv2/examples/scene0000_00/color/5560.jpg',
                             'UI/scannetv2/examples/scene0000_00/depth/5560.png',
                             'wall, floor, cabinet, bed, chair, sofa, table, door, window, bookshelf, picture, counter, desk, curtain, refrigerator, shower curtain, toilet, sink, bathtub, other furniture',
-                        ]],
+                        ],
+                        [
+                            'UI/scannetv2/examples/scene0000_00/color/2760.jpg',
+                            'UI/scannetv2/examples/scene0000_00/depth/2760.png',
+                            'wall, floor, cabinet, bed, chair, sofa, table, door, window, bookshelf, picture, counter, desk, curtain, refrigerator, shower curtain, toilet, sink, bathtub, other furniture',
+                        ],
+                        [
+                            'UI/scannetv2/examples/scene0000_00/color/3700.jpg',
+                            'UI/scannetv2/examples/scene0000_00/depth/3700.png',
+                            'wall, floor, cabinet, bed, chair, sofa, table, door, window, bookshelf, picture, counter, desk, curtain, refrigerator, shower curtain, toilet, sink, bathtub, guitar, other furniture',
+                        ],
+                        ],
                             inputs=[Input_RGB_Component, Depth_Map_Input_Component, Class_Candidates_Component],
                             outputs=[RGB_Semantic_SAM_Mask_Component, RGB_Semantic_SAM_Mask_3D_Component, Depth_Map_Output_Component, Depth_Semantic_SAM_Mask_Component, Depth_Semantic_SAM_Mask_3D_Component],
                             fn=greet_scannet)
