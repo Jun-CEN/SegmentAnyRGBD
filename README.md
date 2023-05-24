@@ -3,7 +3,7 @@
 </p>  
 
 # SAD: Segment Any RGBD
-- Authors: [Jun Cen](https://cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/), [Yixuan Pei](https://github.com/peiyixuan), [Lingdong Kong](https://ldkong.com/)
+- Authors: [Jun Cen](https://cen-jun.com), [Yizheng Wu](https://scholar.google.com/citations?user=0_iF4jMAAAAJ&hl=zh-CN), [Kewei Wang](https://kwwcv.github.io/), [Xingyi Li](https://scholar.google.com/citations?user=XDKQsvUAAAAJ&hl=zh-CN), [Jingkang Yang](https://jingkang50.github.io/), [Yixuan Pei](https://github.com/peiyixuan), [Lingdong Kong](https://ldkong.com/)
 - Institutes: [Visual Intelligence Lab@HKUST](https://cqf.io/lab.html), [HUST](http://english.hust.edu.cn/), [MMLab@NTU](https://www.mmlab-ntu.com/), [Smiles Lab@XJTU](http://www.smiles-xjtu.com/), [NUS](https://nus.edu.sg/)
 
 🎉🎉🎉 Welcome to the Segment Any RGBD GitHub repository! 🎉🎉🎉  
