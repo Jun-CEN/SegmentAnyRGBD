@@ -7,6 +7,8 @@
 - Institutes: [Visual Intelligence Lab@HKUST](https://cqf.io/lab.html), [HUST](http://english.hust.edu.cn/), [MMLab@NTU](https://www.mmlab-ntu.com/), [Smiles Lab@XJTU](http://www.smiles-xjtu.com/), [NUS](https://nus.edu.sg/)
 
 🎉🎉🎉 Welcome to the Segment Any RGBD GitHub repository! 🎉🎉🎉  
+
+🚀🚀🚀 New! We release technical report! 🚀🚀🚀 [**[arxiv]**](https://arxiv.org/abs/2305.14207)
 ***
 🤗🤗🤗 Segment AnyRGBD is a toolbox to segment **rendered depth images** based on SAM! Don't forget to star this repo if you find it interesting!  
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/jcenaa/Semantic_Segment_AnyRGBD)
